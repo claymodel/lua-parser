@@ -16,7 +16,7 @@ const whitespace1 = 1<<'\t' | 1<<' '
 const whitespace2 = 1<<'\t' | 1<<'\n' | 1<<'\r' | 1<<' '
 
 type Error struct {
-	Pos     ast.Position
+	Pos     utils.Position
 	Message string
 	Token   string
 }
@@ -43,20 +43,20 @@ func isDigit(ch int) bool {
 }
 
 type Scanner struct {
-	Pos    ast.Position
+	Pos    utils.Position
 	reader *bufio.Reader
 }
 
 func NewScanner(reader io.Reader, source string) *Scanner {
 	return &Scanner{
-		Pos:    ast.Position{source, 1, 0},
+		Pos:    utils.Position{source, 1, 0},
 		reader: bufio.NewReaderSize(reader, 4096),
 	}
 }
 
 func (sc *Scanner) Error(tok string, msg string) *Error { return &Error{sc.Pos, msg, tok} }
 
-func (sc *Scanner) TokenError(tok ast.Token, msg string) *Error { return &Error{tok.Pos, msg, tok.Str} }
+func (sc *Scanner) TokenError(tok utils.Token, msg string) *Error { return &Error{tok.Pos, msg, tok.Str} }
 
 func (sc *Scanner) readNext() int {
 	ch, err := sc.reader.ReadByte()
@@ -286,10 +286,10 @@ var reservedWords = map[string]int{
 	"return": TReturn, "repeat": TRepeat, "then": TThen, "true": TTrue,
 	"until": TUntil, "while": TWhile}
 
-func (sc *Scanner) Scan(lexer *Lexer) (ast.Token, error) {
+func (sc *Scanner) Scan(lexer *Lexer) (utils.Token, error) {
 redo:
 	var err error
-	tok := ast.Token{}
+	tok := utils.Token{}
 	newline := false
 
 	ch := sc.skipWhiteSpace(whitespace1)
@@ -425,9 +425,9 @@ finally:
 
 type Lexer struct {
 	scanner       *Scanner
-	Stmts         []ast.Stmt
+	Stmts         []utils.Stmt
 	PNewLine      bool
-	Token         ast.Token
+	Token         utils.Token
 	PrevTokenType int
 }
 
@@ -449,12 +449,12 @@ func (lx *Lexer) Error(message string) {
 	panic(lx.scanner.Error(lx.Token.Str, message))
 }
 
-func (lx *Lexer) TokenError(tok ast.Token, message string) {
+func (lx *Lexer) TokenError(tok utils.Token, message string) {
 	panic(lx.scanner.TokenError(tok, message))
 }
 
-func Parse(reader io.Reader, name string) (chunk []ast.Stmt, err error) {
-	lexer := &Lexer{NewScanner(reader, name), nil, false, ast.Token{Str: ""}, TNil}
+func Parse(reader io.Reader, name string) (chunk []utils.Stmt, err error) {
+	lexer := &Lexer{NewScanner(reader, name), nil, false, utils.Token{Str: ""}, TNil}
 	chunk = nil
 	defer func() {
 		if e := recover(); e != nil {
@@ -530,6 +530,6 @@ func dump(node interface{}, level int, s string) string {
 	return strings.Join(buf, "\n")
 }
 
-func Dump(chunk []ast.Stmt) string {
+func Dump(chunk []utils.Stmt) string {
 	return dump(chunk, 0, "   ")
 }
