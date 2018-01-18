@@ -3,7 +3,7 @@ package lua
 import (
 	"context"
 	"fmt"
-	"github.com/yuin/gopher-lua/parse"
+	"github.com/claymodel/lua-parser/parsing"
 	"io"
 	"math"
 	"os"
@@ -1510,7 +1510,7 @@ func (ls *LState) Register(name string, fn LGFunction) {
 /* load and function call operations {{{ */
 
 func (ls *LState) Load(reader io.Reader, name string) (*LFunction, error) {
-	chunk, err := parse.Parse(reader, name)
+	chunk, err := parsing.Parse(reader, name)
 	if err != nil {
 		return nil, newApiErrorE(ApiErrorSyntax, err)
 	}

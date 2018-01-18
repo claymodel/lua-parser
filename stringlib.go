@@ -2,9 +2,8 @@ package lua
 
 import (
 	"fmt"
+	"github.com/claymodel/lua-parser/matcher"
 	"strings"
-
-	"github.com/claymodel/lua-parser/patterns"
 )
 
 const emptyLString LString = LString("")
@@ -112,7 +111,7 @@ func strFind(L *LState) int {
 		return 2
 	}
 
-	mds, err := pm.Find(pattern, unsafeFastStringToReadOnlyBytes(str), init, 1)
+	mds, err := patterns.Find(pattern, unsafeFastStringToReadOnlyBytes(str), init, 1)
 	if err != nil {
 		L.RaiseError(err.Error())
 	}
@@ -152,7 +151,7 @@ func strGsub(L *LState) int {
 	repl := L.CheckAny(3)
 	limit := L.OptInt(4, -1)
 
-	mds, err := pm.Find(pat, unsafeFastStringToReadOnlyBytes(str), 0, limit)
+	mds, err := patterns.Find(pat, unsafeFastStringToReadOnlyBytes(str), 0, limit)
 	if err != nil {
 		L.RaiseError(err.Error())
 	}
@@ -178,7 +177,7 @@ type replaceInfo struct {
 	String   string
 }
 
-func checkCaptureIndex(L *LState, m *pm.MatchData, idx int) {
+func checkCaptureIndex(L *LState, m *patterns.MatchData, idx int) {
 	if idx <= 2 {
 		return
 	}
@@ -187,7 +186,7 @@ func checkCaptureIndex(L *LState, m *pm.MatchData, idx int) {
 	}
 }
 
-func capturedString(L *LState, m *pm.MatchData, str string, idx int) string {
+func capturedString(L *LState, m *patterns.MatchData, str string, idx int) string {
 	checkCaptureIndex(L, m, idx)
 	if idx >= m.CaptureLength() && idx == 2 {
 		idx = 0
@@ -218,7 +217,7 @@ func strGsubDoReplace(str string, info []replaceInfo) string {
 	return string(buf)
 }
 
-func strGsubStr(L *LState, str string, repl string, matches []*pm.MatchData) string {
+func strGsubStr(L *LState, str string, repl string, matches []*patterns.MatchData) string {
 	infoList := make([]replaceInfo, 0, len(matches))
 	for _, match := range matches {
 		start, end := match.Capture(0), match.Capture(1)
@@ -244,7 +243,7 @@ func strGsubStr(L *LState, str string, repl string, matches []*pm.MatchData) str
 	return strGsubDoReplace(str, infoList)
 }
 
-func strGsubTable(L *LState, str string, repl *LTable, matches []*pm.MatchData) string {
+func strGsubTable(L *LState, str string, repl *LTable, matches []*patterns.MatchData) string {
 	infoList := make([]replaceInfo, 0, len(matches))
 	for _, match := range matches {
 		idx := 0
@@ -264,7 +263,7 @@ func strGsubTable(L *LState, str string, repl *LTable, matches []*pm.MatchData) 
 	return strGsubDoReplace(str, infoList)
 }
 
-func strGsubFunc(L *LState, str string, repl *LFunction, matches []*pm.MatchData) string {
+func strGsubFunc(L *LState, str string, repl *LFunction, matches []*patterns.MatchData) string {
 	infoList := make([]replaceInfo, 0, len(matches))
 	for _, match := range matches {
 		start, end := match.Capture(0), match.Capture(1)
@@ -295,7 +294,7 @@ func strGsubFunc(L *LState, str string, repl *LFunction, matches []*pm.MatchData
 type strMatchData struct {
 	str     string
 	pos     int
-	matches []*pm.MatchData
+	matches []*patterns.MatchData
 }
 
 func strGmatchIter(L *LState) int {
@@ -327,7 +326,7 @@ func strGmatchIter(L *LState) int {
 func strGmatch(L *LState) int {
 	str := L.CheckString(1)
 	pattern := L.CheckString(2)
-	mds, err := pm.Find(pattern, []byte(str), 0, -1)
+	mds, err := patterns.Find(pattern, []byte(str), 0, -1)
 	if err != nil {
 		L.RaiseError(err.Error())
 	}
@@ -363,7 +362,7 @@ func strMatch(L *LState) int {
 		offset = 0
 	}
 
-	mds, err := pm.Find(pattern, unsafeFastStringToReadOnlyBytes(str), offset, 1)
+	mds, err := patterns.Find(pattern, unsafeFastStringToReadOnlyBytes(str), offset, 1)
 	if err != nil {
 		L.RaiseError(err.Error())
 	}

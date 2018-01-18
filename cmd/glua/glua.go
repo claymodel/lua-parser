@@ -84,13 +84,13 @@ Available options are:
 				fmt.Println(err.Error())
 				return 1
 			}
-			chunk, err2 := parse.Parse(file, script)
+			chunk, err2 := parsing.Parse(file, script)
 			if err2 != nil {
 				fmt.Println(err2.Error())
 				return 1
 			}
 			if opt_dt {
-				fmt.Println(parse.Dump(chunk))
+				fmt.Println(parsing.Dump(chunk))
 			}
 			if opt_dc {
 				proto, err3 := lua.Compile(chunk, script)
@@ -137,8 +137,8 @@ func doREPL(L *lua.LState) {
 
 func incomplete(err error) bool {
 	if lerr, ok := err.(*lua.ApiError); ok {
-		if perr, ok := lerr.Cause.(*parse.Error); ok {
-			return perr.Pos.Line == parse.EOF
+		if perr, ok := lerr.Cause.(*parsing.Error); ok {
+			return perr.Pos.Line == parsing.EOF
 		}
 	}
 	return false

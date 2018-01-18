@@ -33,7 +33,7 @@ var luaTests []string = []string{
 	"sort.lua",
 	"strings.lua",
 	"vararg.lua",
-	"pm.lua",
+	"patterns.lua",
 	"files.lua",
 }
 
@@ -43,12 +43,12 @@ func testScriptCompile(t *testing.T, script string) {
 		t.Fatal(err)
 		return
 	}
-	chunk, err2 := parse.Parse(file, script)
+	chunk, err2 := parsing.Parse(file, script)
 	if err2 != nil {
 		t.Fatal(err2)
 		return
 	}
-	parse.Dump(chunk)
+	parsing.Dump(chunk)
 	proto, err3 := Compile(chunk, script)
 	if err3 != nil {
 		t.Fatal(err3)

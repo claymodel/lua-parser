@@ -113,7 +113,7 @@ stat:
         /* 'stat = functioncal' causes a reduce/reduce conflict */
         prefixexp {
             if _, ok := $1.(*utils.FuncCallExpr); !ok {
-               yylex.(*Lexer).Error("parse error")
+               yylex.(*Lexer).Error("parsing error")
             } else {
               $$ = &utils.FuncCallStmt{Expr: $1}
               $$.SetLine($1.Line())

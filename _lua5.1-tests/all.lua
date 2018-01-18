@@ -93,7 +93,7 @@ do
   assert(f() == 'a')
 end
 dofile('nextvar.lua')
-dofile('pm.lua')
+dofile('patterns.lua')
 dofile('api.lua')
 assert(dofile('events.lua') == 12)
 dofile('vararg.lua')

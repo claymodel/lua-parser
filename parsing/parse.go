@@ -601,7 +601,7 @@ yydefault:
 		//line parser.go.y:114
 		{
 			if _, ok := yyS[yypt-0].expr.(*utils.FuncCallExpr); !ok {
-				yylex.(*Lexer).Error("parse error")
+				yylex.(*Lexer).Error("parsing error")
 			} else {
 				yyVAL.stmt = &utils.FuncCallStmt{Expr: yyS[yypt-0].expr}
 				yyVAL.stmt.SetLine(yyS[yypt-0].expr.Line())
